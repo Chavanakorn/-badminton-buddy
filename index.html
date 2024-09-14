@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="">
 <head>
+    <meta charset="UTF-8">
     <title>สุ่มทีมคู่แบดมินตัน</title>
     <style>
         /* รีเซ็ตการตั้งค่าพื้นฐานของเบราว์เซอร์ */
@@ -11,7 +12,7 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Tahoma', 'Arial', sans-serif;
             background-color: #f0f0f0;
             color: #333;
             min-height: 100vh;
@@ -120,12 +121,12 @@
 </head>
 <body>
 
-<h1>สุ่มทีมคู่แบดมินตัน</h1>
+<h1>Badminton Buddy</h1>
 
 <div class="container">
     <h2>เพิ่มสมาชิก</h2>
     <div style="display: flex; margin-bottom: 10px;">
-        <input type="text" id="memberName" placeholder="ชื่อสมาชิก">
+        <label for="memberName"></label><input type="text" id="memberName" placeholder="ชื่อสมาชิก">
         <button onclick="addMember()">เพิ่มสมาชิก</button>
     </div>
     <div id="memberList">
@@ -252,7 +253,7 @@
                 // ถ้าผู้เล่นไม่พอที่จะสร้างแมทช์ใหม่ ให้สุ่มผู้เล่นจากแมทช์ก่อนหน้า
                 let matchPlayers = allPlayers.splice(0, allPlayers.length);
                 let neededPlayers = 4 - matchPlayers.length;
-                let usedPlayers = matches.flatMap(match => match.players);
+                matches.flatMap(match => match.players);
                 let candidates = members.filter(m => !matchPlayers.includes(m));
                 shuffleArray(candidates);
                 for (let i = 0; i < neededPlayers; i++) {
