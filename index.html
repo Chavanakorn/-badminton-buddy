@@ -1,7 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
-    <title>สุ่มทีมคู่แบดมินตัน</title>
+    <meta charset="UTF-8">
+    <title>สุ่มทีมคู่แบดมินตัน - Badminton Buddy</title>
+    <meta name="version" content="1.0.0">
+    <meta name="description" content="เว็บสำหรับสุ่มทีมแบดมินตันอัตโนมัติ">
+    <meta name="keywords" content="แบดมินตัน, สุ่มทีม, Badminton, ทีมคู่, กีฬา">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
     <style>
         /* รีเซ็ตการตั้งค่าพื้นฐานของเบราว์เซอร์ */
         * {
@@ -11,9 +16,9 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f0f0;
-            color: #333;
+            font-family: 'Roboto', 'Arial', sans-serif;
+            background-color: #e0f7fa;
+            color: #004d40;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -24,7 +29,21 @@
         h1 {
             margin-bottom: 20px;
             font-size: 36px;
-            color: #0055a5;
+            color: #00796b;
+            display: flex;
+            align-items: center;
+        }
+
+        h1 span {
+            font-size: 18px;
+            color: #004d40;
+            margin-left: 10px;
+        }
+
+        h1 img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
         }
 
         .container {
@@ -40,13 +59,13 @@
         h2 {
             margin-bottom: 10px;
             font-size: 24px;
-            color: #0055a5;
+            color: #00796b;
         }
 
         input[type="text"] {
             width: calc(100% - 120px);
             padding: 10px;
-            border: 2px solid #0055a5;
+            border: 2px solid #00796b;
             border-radius: 5px;
             margin-right: 10px;
             font-size: 16px;
@@ -54,17 +73,18 @@
 
         button {
             padding: 10px 20px;
-            background-color: #ff6600;
+            background: linear-gradient(45deg, #ff6b6b, #ff8800);
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
             color: #fff;
             font-size: 16px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, transform 0.3s;
         }
 
         button:hover {
-            background-color: #e65c00;
+            background-color: #ffb74d;
+            transform: scale(1.05);
         }
 
         #memberList ul, #matchList ul {
@@ -84,11 +104,11 @@
         }
 
         #memberList li button {
-            background-color: #cc0000;
+            background-color: #d32f2f;
         }
 
         #memberList li button:hover {
-            background-color: #b30000;
+            background-color: #c62828;
         }
 
         #generateButton {
@@ -103,7 +123,7 @@
 
         #matches strong {
             font-size: 20px;
-            color: #0055a5;
+            color: #00796b;
         }
 
         #matches ul {
@@ -112,20 +132,88 @@
 
         #matches ul li {
             background-color: #e6f2ff;
-            border: 1px solid #0055a5;
+            border: 1px solid #00796b;
             padding: 5px;
             border-radius: 5px;
         }
+
+        /* Toast Notification */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            margin-left: -125px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 5px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1;
+            left: 50%;
+            bottom: 30px;
+            font-size: 17px;
+        }
+
+        #toast.show {
+            visibility: visible;
+            -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+
+        @-webkit-keyframes fadein {
+            from {
+                bottom: 0;
+                opacity: 0;
+            }
+            to {
+                bottom: 30px;
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadein {
+            from {
+                bottom: 0;
+                opacity: 0;
+            }
+            to {
+                bottom: 30px;
+                opacity: 1;
+            }
+        }
+
+        @-webkit-keyframes fadeout {
+            from {
+                bottom: 30px;
+                opacity: 1;
+            }
+            to {
+                bottom: 0;
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeout {
+            from {
+                bottom: 30px;
+                opacity: 1;
+            }
+            to {
+                bottom: 0;
+                opacity: 0;
+            }
+        }
+
     </style>
 </head>
 <body>
 
-<h1>สุ่มทีมคู่แบดมินตัน</h1>
+<h1>Badminton Buddy <span>V.1.0.0</span></h1>
 
 <div class="container">
     <h2>เพิ่มสมาชิก</h2>
     <div style="display: flex; margin-bottom: 10px;">
-        <input type="text" id="memberName" placeholder="ชื่อสมาชิก">
+        <label for="memberName"></label><input type="text" id="memberName" placeholder="ชื่อสมาชิก">
         <button onclick="addMember()">เพิ่มสมาชิก</button>
     </div>
     <div id="memberList">
@@ -141,15 +229,27 @@
     <ul id="matches"></ul>
 </div>
 
+<!-- Toast notification -->
+<div id="toast"></div>
+
 <script>
     let members = [];
 
     // โหลดรายชื่อสมาชิกจาก Local Storage เมื่อหน้าเว็บโหลด
-    window.onload = function() {
+    window.onload = function () {
         if (localStorage.getItem('members')) {
             members = JSON.parse(localStorage.getItem('members'));
             updateMemberList();
         }
+    }
+
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = "show";
+        setTimeout(function () {
+            toast.className = toast.className.replace("show", "");
+        }, 3000);
     }
 
     function addMember() {
@@ -160,6 +260,11 @@
             nameInput.value = '';
             updateMemberList();
             saveMembers();
+            showToast('เพิ่มสมาชิกเรียบร้อยแล้ว');
+        } else if (!name) {
+            showToast('กรุณาใส่ชื่อสมาชิก');
+        } else {
+            showToast('สมาชิกนี้มีอยู่ในรายการแล้ว');
         }
     }
 
@@ -167,6 +272,7 @@
         members = members.filter(member => member !== name);
         updateMemberList();
         saveMembers();
+        showToast('ลบสมาชิกเรียบร้อยแล้ว');
     }
 
     function updateMemberList() {
@@ -221,7 +327,7 @@
             let teams = [];
             teams.push(matchPlayers.slice(0, 2));
             teams.push(matchPlayers.slice(2, 4));
-            matches.push({ teams: teams, players: matchPlayers });
+            matches.push({teams: teams, players: matchPlayers});
         }
 
         // จัดการกับผู้เล่นที่เหลือ
@@ -247,12 +353,11 @@
                 let teams = [];
                 teams.push(matchPlayers.slice(0, 2));
                 teams.push(matchPlayers.slice(2, 4));
-                matches.push({ teams: teams, players: matchPlayers });
+                matches.push({teams: teams, players: matchPlayers});
             } else if (allPlayers.length > 0) {
                 // ถ้าผู้เล่นไม่พอที่จะสร้างแมทช์ใหม่ ให้สุ่มผู้เล่นจากแมทช์ก่อนหน้า
                 let matchPlayers = allPlayers.splice(0, allPlayers.length);
                 let neededPlayers = 4 - matchPlayers.length;
-                let usedPlayers = matches.flatMap(match => match.players);
                 let candidates = members.filter(m => !matchPlayers.includes(m));
                 shuffleArray(candidates);
                 for (let i = 0; i < neededPlayers; i++) {
@@ -261,7 +366,7 @@
                 let teams = [];
                 teams.push(matchPlayers.slice(0, 2));
                 teams.push(matchPlayers.slice(2, 4));
-                matches.push({ teams: teams, players: matchPlayers });
+                matches.push({teams: teams, players: matchPlayers});
             }
         }
 
